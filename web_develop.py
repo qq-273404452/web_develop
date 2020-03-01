@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, escape, request
+from flask import Flask, session, redirect, url_for, escape, request,render_template
 
 app = Flask(__name__)
 
@@ -28,6 +28,10 @@ def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
     return redirect(url_for('index'))
+
+@app.route('/echats')
+def echarts():
+    return render_template('my_echarts.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=8080)
