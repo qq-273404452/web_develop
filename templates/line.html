@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>温度监控</title>
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdn.bootcss.com/socket.io/1.5.1/socket.io.min.js"></script>
+    <!-- ECharts 3 引入 -->
+    <script src="https://cdn.bootcss.com/echarts/3.7.1/echarts.min.js"></script>
+</head>
+
+<body>
+    <!--为ECharts准备一个具备大小（宽高）的Dom-->
+    <div id="main" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+
+    <script type="text/javascript">
+
+    var myChart = echarts.init(document.getElementById('main'));
+
+    myChart.setOption({
+        title: {
+            text: '温度监控'
+        },
+        tooltip: {},
+        legend: {
+            data:['TS1','TS2','TS3','TS4']
+        },
+        xAxis: {
+            data: []
+        },
+        yAxis: {},
+        series: [{
+            name: 'TS1',
+            type: 'line',
+            data: []
+        },{
+            name: 'TS2',
+            type: 'line',
+            data: []
+        },{
+            name: 'TS3',
+            type: 'line',
+            data: []
+        },{
+            name: 'TS4',
+            type: 'line',
+            data: []
+        }]
+    });
+
+
+    // 五个全局变量：time、cpu1、cpu2、cpu3、cpu4
+    var time = ["","","","","","","","","",""],
+        TS1 = [0,0,0,0,0,0,0,0,0,0],
+        TS2 = [0,0,0,0,0,0,0,0,0,0],
+        TS3 = [0,0,0,0,0,0,0,0,0,0],
+        TS4 = [0,0,0,0,0,0,0,0,0,0]
+
+
+    //准备好统一的 callback 函数
+    var update_mychart = function (res) { //res是json格式的response对象
+
+        // 隐藏加载动画
+        myChart.hideLoading();
+
+        // 准备数据
+        time.push(res.data[0]);
+        TS1.push(parseFloat(res.data[1]));
+        TS2.push(parseFloat(res.data[2]));
+        TS3.push(parseFloat(res.data[3]));
+        TS4.push(parseFloat(res.data[4]));
+        if (time.length >= 10){
+            time.shift();
+            TS1.shift();
+            TS2.shift();
+            TS3.shift();
+            TS4.shift();
+        }
+
+        // 填入数据
+        myChart.setOption({
+            xAxis: {
+                data: time
+            },
+            series: [{
+                name: 'TS1', // 根据名字对应到相应的系列
+                data: TS1
+            },{
+                name: 'TS2',
+                data: TS2
+            },{
+                name: 'TS3',
+                data: TS3
+            },{
+                name: 'TS4',
+                data: TS4
+            }]
+        });
+
+    };
+
+    // 首次显示加载动画
+    myChart.showLoading();
+
+
+    // 建立socket连接，等待服务器“推送”数据，用回调函数更新图表
+    $(document).ready(function() {
+        namespace = '/test';
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+
+        socket.on('server_response', function(res) {
+            update_mychart(res);
+        });
+
+    });
+
+    </script>
+</body>
+</html>
