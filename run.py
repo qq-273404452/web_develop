@@ -1,8 +1,8 @@
 from flask import Flask, render_template
 from pymongo import MongoClient
 from threading import Lock
-import getdata
 from flask_socketio import SocketIO
+
 
 async_mode = None
 
