@@ -42,7 +42,7 @@ tweepy==3.8.0
 typing==3.7.4.1
 tzlocal==1.4
 uhashring==1.1
-urllib3==1.25.3
+urllib3==1.26.5
 Werkzeug==0.15.3
 xlrd==1.1.0
 yarl==1.4.2
